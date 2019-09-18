@@ -1,0 +1,39 @@
+version: "3"
+services:
+  control-plane:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: ["/go/bin/control-plane"]
+    ports:
+      - "5678:5678"
+      - "8000:8000"
+
+  envoy:
+    image: envoyproxy/envoy:v1.11.1
+    ports:
+      - "9901:9901"
+      - "3000:3000"
+    environment:
+      - ENVOY_CONFIG_PATH=/config.yaml
+    command: /usr/local/bin/envoy -l trace -c /config.yaml
+    volumes:
+      - "./assets/config.yaml:/config.yaml"
+    depends_on:
+      - control-plane
+
+  test-server-dev:
+    image: envoy-control-plane-example_control-plane:latest
+    command: ["/go/bin/server"]
+    environment:
+      - ENV=development
+    depends_on:
+      - control-plane
+
+  test-server-prod:
+    image: envoy-control-plane-example_control-plane:latest
+    command: ["/go/bin/server"]
+    environment:
+      - ENV=production
+    depends_on:
+      - control-plane
