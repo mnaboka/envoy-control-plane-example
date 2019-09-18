@@ -55,7 +55,7 @@ type simpleManager struct {
 }
 
 func (m *simpleManager) routes() []cache.Resource {
-	if len(m.routesConfig.VirtualHosts) > 0 {
+	if len(m.routesConfig.VirtualHosts) > 0 && len(m.routesConfig.VirtualHosts[0].Routes) > 0 {
 		return []cache.Resource{m.routesConfig}
 	}
 	return nil
